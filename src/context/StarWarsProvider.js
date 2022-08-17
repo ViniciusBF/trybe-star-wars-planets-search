@@ -1,24 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { node } from 'prop-types';
 import StarWarsContext from './StarWarsContext';
 import getStarWarsPlanets from '../services/starWarsAPI';
 
 function StarWarsProvider({ children }) {
   const [planets, setPlanets] = useState([]);
+  const [list, setList] = useState([]);
+  const [filters, setFilters] = useState({
+    filterByName: { name: '' },
+  });
 
-  const getPlanets = async () => {
-    const { results } = await getStarWarsPlanets();
-    results.forEach((e) => {
-      delete e.residents;
-    });
-    setPlanets(results);
-  };
+  useEffect(() => {
+    const getPlanets = async () => {
+      const { results } = await getStarWarsPlanets();
+      results.forEach((e) => {
+        delete e.residents;
+      });
+      setPlanets(results);
+    };
+
+    getPlanets();
+  }, []);
 
   return (
     <StarWarsContext.Provider
       value={ {
+        filters,
+        setFilters,
+        list,
+        setList,
         planets,
-        getPlanets,
       } }
     >
       {children}
