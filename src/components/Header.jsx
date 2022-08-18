@@ -1,6 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react';
 import StarWarsContext from '../context/StarWarsContext';
 
+const COLUMN_FILTER = [
+  'population', 'orbital_period', 'diameter', 'rotation_period', 'surface_water',
+];
+
 export default function Header() {
   const [valueNumber, setValue] = useState('0');
   const [column, setColumn] = useState('population');
@@ -36,7 +40,9 @@ export default function Header() {
         .reduce((acc, curr) => filtroNumerico(acc, curr), firstFilter);
       return result;
     };
+    const newCol = COLUMN_FILTER.filter((e) => !filters.categoriesUsed.includes(e));
 
+    setColumn(newCol[0]);
     setList(filterPlanets());
   }, [filters, planets, setList]);
 
@@ -54,11 +60,12 @@ export default function Header() {
           onChange={ ({ target: { value } }) => setColumn(value) }
           value={ column }
         >
-          <option value="population">population</option>
-          <option value="orbital_period">orbital_period</option>
-          <option value="diameter">diameter</option>
-          <option value="rotation_period">rotation_period</option>
-          <option value="surface_water">surface_water</option>
+          {
+            COLUMN_FILTER.filter((e) => !filters.categoriesUsed.includes(e))
+              .map((e, i) => (
+                <option key={ i } value={ e }>{ e }</option>
+              ))
+          }
         </select>
         <select
           data-testid="comparison-filter"
@@ -79,6 +86,8 @@ export default function Header() {
         <button
           data-testid="button-filter"
           onClick={ () => setFilters({ ...filters,
+            categoriesUsed: [...filters.categoriesUsed,
+              column],
             filterNumber: [...filters.filterNumber,
               { columnFilter: column,
                 comparisonFilter: comparison,

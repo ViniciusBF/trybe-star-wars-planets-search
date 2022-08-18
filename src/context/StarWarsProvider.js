@@ -9,6 +9,7 @@ function StarWarsProvider({ children }) {
   const [filters, setFilters] = useState({
     filterByName: { name: '' },
     filterNumber: [],
+    categoriesUsed: [],
   });
 
   useEffect(() => {
