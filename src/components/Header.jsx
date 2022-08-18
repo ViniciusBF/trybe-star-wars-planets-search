@@ -1,7 +1,11 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import StarWarsContext from '../context/StarWarsContext';
 
 export default function Header() {
+  const [valueNumber, setValue] = useState('0');
+  const [column, setColumn] = useState('population');
+  const [comparison, setComparison] = useState('maior que');
+
   const {
     setFilters,
     filters,
@@ -10,9 +14,26 @@ export default function Header() {
   } = useContext(StarWarsContext);
 
   useEffect(() => {
+    const filtroNumerico = (array, obj) => {
+      const { columnFilter, comparisonFilter, valueFilter } = obj;
+      switch (comparisonFilter) {
+      case 'maior que':
+        return array.filter((e) => Number(e[columnFilter]) > valueFilter);
+      case 'menor que':
+        return array.filter((e) => Number(e[columnFilter]) < valueFilter);
+      case 'igual a':
+        return array.filter((e) => Number(e[columnFilter]) === valueFilter);
+      default:
+        return array;
+      }
+    };
+
     const filterPlanets = () => {
-      const reg = new RegExp(filters.filterByName, 'i');
-      const result = planets.filter(({ name }) => reg.test(name));
+      const { filterByName, filterNumber } = filters;
+      const reg = new RegExp(filterByName.name, 'i');
+      const firstFilter = planets.filter(({ name }) => reg.test(name));
+      const result = filterNumber
+        .reduce((acc, curr) => filtroNumerico(acc, curr), firstFilter);
       return result;
     };
 
@@ -26,10 +47,12 @@ export default function Header() {
         <input
           data-testid="name-filter"
           onChange={ ({ target }) => setFilters({ ...filters,
-            filterByName: target.value }) }
+            filterByName: { name: target.value } }) }
         />
         <select
           data-testid="column-filter"
+          onChange={ ({ target: { value } }) => setColumn(value) }
+          value={ column }
         >
           <option value="population">population</option>
           <option value="orbital_period">orbital_period</option>
@@ -39,11 +62,32 @@ export default function Header() {
         </select>
         <select
           data-testid="comparison-filter"
+          onChange={ ({ target: { value } }) => setComparison(value) }
+          value={ comparison }
         >
-          <option value="maior_que">maior que</option>
-          <option value="menor_que">menor que</option>
-          <option value="igual_a">igual a</option>
+          <option value="maior que">maior que</option>
+          <option value="menor que">menor que</option>
+          <option value="igual a">igual a</option>
         </select>
+        <input
+          onChange={ ({ target: { value } }) => setValue(value) }
+          value={ valueNumber }
+          min="0"
+          data-testid="value-filter"
+          type="number"
+        />
+        <button
+          data-testid="button-filter"
+          onClick={ () => setFilters({ ...filters,
+            filterNumber: [...filters.filterNumber,
+              { columnFilter: column,
+                comparisonFilter: comparison,
+                valueFilter: Number(valueNumber),
+              }] }) }
+          type="button"
+        >
+          Filtrar
+        </button>
       </div>
     </header>
   );
