@@ -25,10 +25,8 @@ export default function Header() {
         return array.filter((e) => Number(e[columnFilter]) > valueFilter);
       case 'menor que':
         return array.filter((e) => Number(e[columnFilter]) < valueFilter);
-      case 'igual a':
-        return array.filter((e) => Number(e[columnFilter]) === valueFilter);
       default:
-        return array;
+        return array.filter((e) => Number(e[columnFilter]) === valueFilter);
       }
     };
 
@@ -49,7 +47,8 @@ export default function Header() {
   const excluirFiltro = (param) => {
     const newFilters = filters.filterNumber
       .filter(({ columnFilter }) => columnFilter !== param.columnFilter);
-    const newCategoriesUsed = newFilters.filter(({ columnFilter }) => columnFilter);
+    const newCategoriesUsed = newFilters.map(({ columnFilter }) => columnFilter);
+    console.log(newCategoriesUsed);
 
     setFilters({
       ...filters,
