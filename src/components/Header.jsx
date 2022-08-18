@@ -46,6 +46,18 @@ export default function Header() {
     setList(filterPlanets());
   }, [filters, planets, setList]);
 
+  const excluirFiltro = (param) => {
+    const newFilters = filters.filterNumber
+      .filter(({ columnFilter }) => columnFilter !== param.columnFilter);
+    const newCategoriesUsed = newFilters.filter(({ columnFilter }) => columnFilter);
+
+    setFilters({
+      ...filters,
+      filterNumber: newFilters,
+      categoriesUsed: newCategoriesUsed,
+    });
+  };
+
   return (
     <header>
       <h1>Projeto Star Wars</h1>
@@ -97,6 +109,32 @@ export default function Header() {
         >
           Filtrar
         </button>
+        <button
+          data-testid="button-remove-filters"
+          type="button"
+          onClick={ () => setFilters({
+            ...filters,
+            categoriesUsed: [],
+            filterNumber: [],
+          }) }
+        >
+          Remover Filtros
+        </button>
+      </div>
+      <div>
+        {
+          filters.filterNumber.map((e, i) => (
+            <div key={ i } data-testid="filter">
+              <button
+                id={ `btn-${i}` }
+                type="button"
+                onClick={ () => excluirFiltro(e) }
+              >
+                { e.columnFilter }
+              </button>
+            </div>
+          ))
+        }
       </div>
     </header>
   );
